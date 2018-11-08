@@ -1,4 +1,4 @@
-# Homepage Anton Rohr
+# Anton Rohr
 * twitter: [@anton_rohr](https://twitter.com/anton_rohr)
 * reddit: [/u/antonrohr](https://www.reddit.com/user/antonrohr/)
 * github: [antonrohr](https://github.com/antonrohr/)
