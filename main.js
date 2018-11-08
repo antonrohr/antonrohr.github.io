@@ -33,6 +33,8 @@ function get(url) {
 
 document.addEventListener("DOMContentLoaded", function() {
 
+	showdown.setFlavor('github');
+
 	get('README.md').then(function(response) {
 		var sdConverter = new showdown.Converter();
 		document.body.innerHTML = sdConverter.makeHtml(response);
