@@ -33,11 +33,13 @@ function get(url) {
 
 document.addEventListener("DOMContentLoaded", function() {
 
-	console.log(showdown)
-	var converter = new showdown.Converter();
+
+
 
 	get('README.md').then(function(response) {
-		document.body = converter.makeHTML(response)
+		var sdConverter = new showdown.Converter();
+		console.log(sdConverter)
+		document.body = sdConverter.makeHTML(response)
 	}, function(error) {
 		console.error("Failed!", error);
 	});
