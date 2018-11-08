@@ -32,9 +32,11 @@ function get(url) {
 
 
 document.addEventListener("DOMContentLoaded", function() {
+
+	console.log(showdown)
+	var converter = new showdown.Converter();
+
 	get('README.md').then(function(response) {
-		console.log(response)
-		var converter = new showdown.Converter();
 		document.body = converter.makeHTML(response)
 	}, function(error) {
 		console.error("Failed!", error);
