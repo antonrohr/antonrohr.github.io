@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	get('README.md').then(function(response) {
 		var sdConverter = new showdown.Converter();
-		document.body.innerHTML = sdConverter.makeHtml(response);
+		document.getElementById('content').innerHTML = sdConverter.makeHtml(response);
 	}, function(error) {
 		console.error("Failed!", error);
 	});
