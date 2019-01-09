@@ -6,9 +6,11 @@ var Board = /** @class */ (function () {
         this.width = 400;
         this.height = 400;
         this.time = 0;
-        this.counter = 0;
-        this.rounds = 10;
+        this.maxRounds = 15;
+        this.rounds = this.maxRounds;
+        this.roundTime = 200;
         this.div = document.createElement('div');
+        this.scores = document.createElement('div');
         this.results = document.createElement('div');
         this.resultsWith = document.createElement('div');
         this.resultsWithout = document.createElement('div');
@@ -22,12 +24,19 @@ var Board = /** @class */ (function () {
         this.div.style.margin = '0 auto';
         this.div.style.backgroundImage = "url('img/coffee_tree.jpg')";
         this.div.style.backgroundSize = this.width.toPx() + ' ' + this.height.toPx();
+        this.scores.style.width = this.width.toPx();
+        this.scores.style.border = 'solid';
+        this.scores.style.borderWidth = 'thin';
+        this.scores.style.margin = '1px auto';
+        this.scores.style.textAlign = 'center';
+        this.scores.innerHTML = '&nbsp;';
         var height = '100px';
         this.results.style.width = this.width.toPx();
         this.results.style.height = height;
         this.results.style.border = 'solid';
         this.results.style.borderWidth = 'thin';
-        this.results.style.margin = '5px auto';
+        this.results.style.margin = '0px auto';
+        this.results.style.textAlign = 'center';
         this.resultsWithout.style.width = (this.width / 2).toPx();
         this.resultsWithout.style.height = height;
         this.resultsWithout.style.cssFloat = 'left';
@@ -44,7 +53,7 @@ var Board = /** @class */ (function () {
         if (json != null) {
             var score = JSON.parse(json);
             var resStr = 'with BRAIN BREW<br>';
-            resStr += 'score: ' + String(score.avgTime) + '<br>';
+            resStr += 'avg score: ' + String(score.avgTime) + '<br>';
             resStr += 'games played: ' + String(score.gamesPlayed);
             this.resultsWith.innerHTML = resStr;
         }
@@ -54,7 +63,7 @@ var Board = /** @class */ (function () {
         if (json != null) {
             var score = JSON.parse(json);
             var resStr = 'without BRAIN BREW<br>';
-            resStr += 'score: ' + String(score.avgTime) + '<br>';
+            resStr += 'avg score: ' + String(score.avgTime) + '<br>';
             resStr += 'games played: ' + String(score.gamesPlayed);
             this.resultsWithout.innerHTML = resStr;
         }
@@ -71,9 +80,9 @@ var Board = /** @class */ (function () {
         var bean = new CoffeeBean();
         this.add(bean);
         this.rounds--;
-        if (this.rounds > 0) {
-            setTimeout(this.tick.bind(this), 1000);
-        }
+        // if (this.rounds > 0) {
+        // 	setTimeout(this.tick.bind(this), this.roundTime)
+        // } 
     };
     Board.prototype.add = function (bean) {
         bean.top = (this.height - bean.size) * bean.y;
@@ -85,15 +94,20 @@ var Board = /** @class */ (function () {
     Board.prototype.remove = function (bean) {
         this.div.removeChild(bean.div);
         bean.board = undefined;
-        this.counter++;
         this.time += new Date().getTime() - bean.constructTime.getTime();
         if (!this.div.firstChild && this.rounds <= 0) {
             this.end();
-            this.rounds = 10;
+            this.rounds = this.maxRounds;
+        }
+        else {
+            var bean_1 = new CoffeeBean();
+            this.add(bean_1);
+            this.rounds--;
         }
     };
     Board.prototype.end = function () {
         console.log('end');
+        this.scores.innerHTML = 'Congratulations, your score is ' + this.time + '\n(lower is better)';
         if (this.control != undefined) {
             this.control.displayStart();
         }
@@ -126,17 +140,23 @@ var Board = /** @class */ (function () {
             localStorage.setItem('without', newJson);
             this.displayWithoutStats();
         }
-        alert('Congratulations, your score is ' + this.time + '\n(lower is better)');
         this.time = 0;
     };
     return Board;
 }());
 var CoffeeBean = /** @class */ (function () {
     function CoffeeBean() {
-        this.size = 20;
+        var _this = this;
+        this.size = 45;
         this.div = document.createElement('div');
-        this.x = Math.random();
-        this.y = Math.random();
+        var x = Math.random();
+        var y = Math.random();
+        while (Math.sqrt(Math.pow(x - 0.5, 2) + Math.pow(y - 0.45, 2)) > 0.4) {
+            x = Math.random();
+            y = Math.random();
+        }
+        this.x = x;
+        this.y = y;
         // this.div.innerHTML = "be"
         this.div.style.position = 'absolute';
         this.div.style.width = this.size.toPx();
@@ -144,7 +164,15 @@ var CoffeeBean = /** @class */ (function () {
         // this.div.style.border = 'solid'
         this.div.style.backgroundImage = "url('img/coffee_bean.png')";
         this.div.style.backgroundSize = this.size.toPx();
-        this.div.onclick = this.click.bind(this);
+        // this.div.onclick = this.click.bind(this)
+        this.div.addEventListener("click", function (ev) {
+            ev.preventDefault();
+            _this.click();
+        });
+        this.div.addEventListener("touchstart", function (ev) {
+            ev.preventDefault();
+            _this.click();
+        });
         this.constructTime = new Date();
     }
     Object.defineProperty(CoffeeBean.prototype, "top", {
@@ -244,5 +272,6 @@ var board = new Board();
 var control = new ControlButtons(board);
 document.body.append(control.div);
 document.body.append(board.div);
+document.body.append(board.scores);
 document.body.append(board.results);
 //# sourceMappingURL=coffee_game.js.map

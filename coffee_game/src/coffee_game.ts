@@ -12,9 +12,11 @@ class Board {
 	width = 400
 	height = 400
 	time = 0
-	counter = 0
-	rounds = 10
+	maxRounds = 15
+	rounds = this.maxRounds
+	roundTime = 200
 	div = document.createElement('div')
+	scores = document.createElement('div')
 	results = document.createElement('div')
 	resultsWith = document.createElement('div')
 	resultsWithout = document.createElement('div')
@@ -32,12 +34,20 @@ class Board {
 		this.div.style.backgroundImage = "url('img/coffee_tree.jpg')"
 		this.div.style.backgroundSize = this.width.toPx() + ' ' + this.height.toPx()
 
+		this.scores.style.width = this.width.toPx()
+		this.scores.style.border = 'solid'
+		this.scores.style.borderWidth = 'thin'
+		this.scores.style.margin = '1px auto'
+		this.scores.style.textAlign = 'center'
+		this.scores.innerHTML = '&nbsp;'
+
 		let height = '100px'
 		this.results.style.width = this.width.toPx()
 		this.results.style.height = height
 		this.results.style.border = 'solid'
 		this.results.style.borderWidth = 'thin'
-		this.results.style.margin = '5px auto'
+		this.results.style.margin = '0px auto'
+		this.results.style.textAlign = 'center'
 		
 		this.resultsWithout.style.width = (this.width / 2).toPx() 
 		this.resultsWithout.style.height = height
@@ -58,7 +68,7 @@ class Board {
 		if (json != null) {
 			let score = JSON.parse(json)
 			let resStr = 'with BRAIN BREW<br>'
-			resStr += 'score: ' + String(score.avgTime) + '<br>'
+			resStr += 'avg score: ' + String(score.avgTime) + '<br>'
 			resStr += 'games played: ' + String(score.gamesPlayed)
 			this.resultsWith.innerHTML = resStr
 		}
@@ -68,7 +78,7 @@ class Board {
 		if (json != null) {
 			let score = JSON.parse(json)
 			let resStr = 'without BRAIN BREW<br>'
-			resStr += 'score: ' + String(score.avgTime) + '<br>'
+			resStr += 'avg score: ' + String(score.avgTime) + '<br>'
 			resStr += 'games played: ' + String(score.gamesPlayed)
 			this.resultsWithout.innerHTML = resStr
 		}
@@ -86,9 +96,9 @@ class Board {
 		this.add(bean)
 		this.rounds--
 
-		if (this.rounds > 0) {
-			setTimeout(this.tick.bind(this), 1000)
-		} 
+		// if (this.rounds > 0) {
+		// 	setTimeout(this.tick.bind(this), this.roundTime)
+		// } 
 	}
 	add(bean: CoffeeBean) {
 
@@ -105,16 +115,22 @@ class Board {
 		this.div.removeChild(bean.div)
 		bean.board = undefined
 
-		this.counter++
 		this.time += new Date().getTime() - bean.constructTime.getTime()
 
 		if (!this.div.firstChild && this.rounds <= 0) {
 			this.end()
-			this.rounds = 10
+			this.rounds = this.maxRounds
+		} else {
+			let bean = new CoffeeBean()
+			this.add(bean)
+			this.rounds--
 		}
 	}
 	end() {
 		console.log('end')
+
+		this.scores.innerHTML = 'Congratulations, your score is '+ this.time + '\n(lower is better)'
+
 		if (this.control != undefined) {
 			this.control.displayStart()
 		}
@@ -152,14 +168,14 @@ class Board {
 			this.displayWithoutStats()
 		}
 
-		alert('Congratulations, your score is '+ this.time + '\n(lower is better)')
+		
 		this.time = 0
 		
 	}
 }
 
 class CoffeeBean {
-	size = 20
+	size = 45
 	x: number; 
 	y: number;
 	board?: Board
@@ -167,9 +183,16 @@ class CoffeeBean {
 	constructTime: Date
 
 	constructor() {
-		this.x = Math.random()
-		this.y = Math.random()
-		
+		let x = Math.random()
+		let y = Math.random()
+		while(Math.sqrt(Math.pow(x-0.5, 2) + Math.pow(y-0.45, 2)) > 0.4) {
+			x = Math.random()
+			y = Math.random()
+		}
+
+		this.x = x
+		this.y = y
+
 		// this.div.innerHTML = "be"
 		this.div.style.position = 'absolute'
 		this.div.style.width = this.size.toPx()
@@ -178,7 +201,15 @@ class CoffeeBean {
 		this.div.style.backgroundImage = "url('img/coffee_bean.png')"
 		this.div.style.backgroundSize = this.size.toPx()
 
-		this.div.onclick = this.click.bind(this)
+		// this.div.onclick = this.click.bind(this)
+		this.div.addEventListener("click", (ev) => {
+			ev.preventDefault()
+			this.click()
+		})
+		this.div.addEventListener("touchstart", (ev) => {
+			ev.preventDefault()
+			this.click()
+		})
 
 		this.constructTime = new Date()
 	}
@@ -278,4 +309,5 @@ let control = new ControlButtons(board)
 
 document.body.append(control.div)
 document.body.append(board.div)
+document.body.append(board.scores)
 document.body.append(board.results)
