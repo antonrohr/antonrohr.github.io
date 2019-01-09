@@ -126,6 +126,7 @@ var Board = /** @class */ (function () {
             localStorage.setItem('without', newJson);
             this.displayWithoutStats();
         }
+        alert('Congratulations, your score is ' + this.time + '\n(lower is better)');
         this.time = 0;
     };
     return Board;

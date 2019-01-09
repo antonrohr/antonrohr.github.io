@@ -152,6 +152,7 @@ class Board {
 			this.displayWithoutStats()
 		}
 
+		alert('Congratulations, your score is '+ this.time + '\n(lower is better)')
 		this.time = 0
 		
 	}
