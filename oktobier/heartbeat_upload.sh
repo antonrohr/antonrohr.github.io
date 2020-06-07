@@ -13,10 +13,10 @@ echo "<!DOCTYPE html>
 <html>
 	<head>
 		<title>Redirect</title>
-		<meta http-equiv=\"refresh\" content=\"0; url=http://"$CURRENT_IP":8080/\" />
+		<meta http-equiv=\"refresh\" content=\"0; url=http://"$CURRENT_IP"/\" />
 	</head>
 	<body>
-		Redirect <a href=\"http://"$CURRENT_IP":8080/\">here</a>
+		Redirect <a href=\"http://"$CURRENT_IP"/\">here</a>
 	</body>
 </html>" > index.html &&
 git add addr index.html &&
